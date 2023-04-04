@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import { gql, useMutation } from "@apollo/client";
+import React, { useRef } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { isLoggedInVar, logUserIn } from "../apollo";
+import AuthButton from "../components/auth/AuthButton";
 import AuthLayout from "../components/auth/AuthLayout";
 import { TextInput } from "../components/auth/AuthShared";
-import AuthButton from './../components/auth/AuthButton';
-import { gql, useMutation } from "@apollo/client";
-import { logUserIn } from './../apollo';
 
-const LOG_IN_MUTATION = gql`
+const LOGIN_MUTATION = gql`
     mutation login($username: String!, $password: String!) {
         login(username: $username, password: $password) {
             ok
@@ -30,7 +31,7 @@ export default function Login({ route: { params } }) {
             await logUserIn(token);
         }
     };
-    const [logInMutation, { loading }] = useMutation(LOG_IN_MUTATION, {
+    const [logInMutation, { loading }] = useMutation(LOGIN_MUTATION, {
         onCompleted,
     });
     const onNext = (nextOne) => {

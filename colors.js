@@ -1,3 +1,3 @@
-export default colors = {
-    blue: "#0095f6",
+export const colors = {
+    blue: "#0095F6",
 };

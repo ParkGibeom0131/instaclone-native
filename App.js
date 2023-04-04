@@ -6,9 +6,10 @@ import { Asset } from "expo-asset";
 import LoggedOutNav from "./navigators/LoggedOutNav";
 import { NavigationContainer } from "@react-navigation/native";
 import { ApolloProvider, useReactiveVar } from "@apollo/client";
-import client, { isLoggedInVar, tokenVar } from './apollo';
+import client, { isLoggedInVar, tokenVar, cache } from './apollo';
 import LoggedInNav from "./navigators/LoggedInNav";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AsyncStorageWrapper, CachePersistor, persistCache } from "apollo3-cache-persist";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -19,22 +20,29 @@ export default function App() {
   const preloadAssets = () => {
     const fontsToLoad = [Ionicons.font];
     const fontPromises = fontsToLoad.map((font) => Font.loadAsync(font));
-    const imagesToLoad = [
-      require("./assets/logo.png"),
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/840px-Instagram_logo.svg.png",
-    ];
+    const imagesToLoad = [require("./assets/logo.png")];
     const imagePromises = imagesToLoad.map((image) => Asset.loadAsync(image));
     return Promise.all([...fontPromises, ...imagePromises]);
   }
   const preload = async () => {
     const token = await AsyncStorage.getItem("token");
+    // Promise를 return 하기 전에 token을 AsyncStorage에서 갖고 오는 과정
     // AsyncStorage.remove("token");
     if (token) {
       isLoggedInVar(true);
+      // token이 존재한다면 isLoggedInVar을 true
       tokenVar(token);
     }
+
+    const persistor = new CachePersistor({
+      cache,
+      storage: new AsyncStorageWrapper(AsyncStorage),
+    });
+    await persistor.purge();
+
     return preloadAssets();
   };
+  // preload는 반드시 Promise를 return 해야 함
   if (loading) {
     return (
       <AppLoading

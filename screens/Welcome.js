@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components/native";
-import colors from "../colors";
+import { colors } from "../colors";
 import { TouchableOpacity } from "react-native";
 import AuthButton from "../components/auth/AuthButton";
 import AuthLayout from "../components/auth/AuthLayout";
