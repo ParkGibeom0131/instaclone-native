@@ -9,7 +9,9 @@ import {
     getMainDefinition,
     offsetLimitPagination,
 } from "@apollo/client/utilities";
+import { onError } from "@apollo/client/link/error";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createUploadLink } from "apollo-upload-client";
 
 export const isLoggedInVar = makeVar(false);
 // React Native는 AsyncStorage가 있는데, 이는 promise에 기반한 API
@@ -39,7 +41,11 @@ export const logUserOut = async () => {
 }
 
 const httpLink = createHttpLink({
-    uri: "https://6d3f-121-168-143-249.jp.ngrok.io/graphql",
+
+});
+
+const uploadHttpLink = createUploadLink({
+    uri: "https://bab3-121-168-143-249.jp.ngrok.io/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -75,8 +81,18 @@ export const cache = new InMemoryCache({
     },
 })
 
+const onErrorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+        console.log(`GraphQL Error`, graphQLErrors);
+    }
+    if (networkError) {
+        console.log(`Network Error`, networkError);
+    }
+});
+
 const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: authLink.concat(onErrorLink).concat(uploadHttpLink),
+    // httpLink가 마지막으로 종료되는 link이기 때문에 마지막에 concat
     cache,
 });
 

@@ -1,4 +1,5 @@
 import AppLoading from "expo-app-loading";
+import * as SplashScreen from 'expo-splash-screen';
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import * as Font from "expo-font";
@@ -10,6 +11,8 @@ import client, { isLoggedInVar, tokenVar, cache } from './apollo';
 import LoggedInNav from "./navigators/LoggedInNav";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AsyncStorageWrapper, CachePersistor, persistCache } from "apollo3-cache-persist";
+
+// SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +47,7 @@ export default function App() {
   };
   // preload는 반드시 Promise를 return 해야 함
   if (loading) {
+
     return (
       <AppLoading
         startAsync={preload}
